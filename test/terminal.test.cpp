@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include "kaycxx/term.hpp"
-
-TEST(LibraryTemplateTest, sums_two_values) {
+TEST(Terminal, todo) {
     // TODO
 }
