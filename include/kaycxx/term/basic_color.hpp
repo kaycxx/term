@@ -15,9 +15,8 @@ namespace kaycxx::term {
 /**
  * Basic terminal palette color.
  *
- * The index is the ANSI color slot from 0 to 7. Bright colors use the same slot
- * together with the bright flag and are rendered as SGR colors 90 to 97 or
- * 100 to 107.
+ * The index is the ANSI color slot from 0 to 7. Bright colors use the same slot together with the bright flag.
+ * They are rendered as SGR colors 90 to 97 or 100 to 107.
  */
 struct basic_color {
     /** ANSI color slot from 0 to 7. */

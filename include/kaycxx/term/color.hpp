@@ -19,8 +19,7 @@ namespace kaycxx::term {
 /**
  * Terminal color value.
  *
- * A color can be one of the basic ANSI palette colors, one of the indexed
- * 256-color palette values, or a true-color RGB value.
+ * A color can be one of the basic ANSI palette colors, one of the indexed 256-color palette values, or a true-color RGB value.
  */
 using color = std::variant<
     basic_color,

@@ -16,8 +16,7 @@ namespace kaycxx::term::detail {
 /**
  * Sanitizes a string for use as an OSC payload.
  *
- * ESC and BEL are removed because they can terminate or inject terminal control
- * sequences inside OSC strings.
+ * ESC and BEL are removed because they can terminate or inject terminal control sequences inside OSC strings.
  *
  * @param value  String to sanitize.
  * @returns Sanitized OSC payload.

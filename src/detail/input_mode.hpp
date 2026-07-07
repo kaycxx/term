@@ -19,8 +19,7 @@ namespace kaycxx::term::detail {
 /**
  * Stack of saved terminal input states.
  *
- * The stack stores native operating-system input state snapshots and restores
- * them in last-in-first-out order.
+ * The stack stores native operating-system input state snapshots and restores them in last-in-first-out order.
  */
 class input_mode_stack {
 public:

@@ -35,21 +35,18 @@ class input_mode_stack;
 /**
  * Terminal output and input helper.
  *
- * The terminal writes ANSI/VT control sequences when enabled and provides
- * minimal cross-platform input mode and key reading helpers.
+ * The terminal writes ANSI/VT control sequences when enabled and provides minimal cross-platform input mode and key reading helpers.
  */
 class terminal {
 public:
     /**
      * Creates a terminal helper for an output stream.
      *
-     * The stream defaults to `std::cout`. All text and all ANSI/VT control
-     * sequences are written to this stream. In automatic ANSI mode, the stream is
-     * also used to detect whether ANSI/VT output should be enabled.
+     * The stream defaults to `std::cout`. All text and all ANSI/VT control sequences are written to this stream.
+     * In automatic ANSI mode, the stream is also used to detect whether ANSI/VT output should be enabled.
      *
      * @param stream  Output stream to write to. The stream must outlive the terminal.
-     * @param mode    ANSI control sequence mode. Automatic mode checks `FORCE_COLOR`,
-     *                `NO_COLOR`, and terminal support.
+     * @param mode    ANSI control sequence mode. Automatic mode checks `FORCE_COLOR`, `NO_COLOR`, and terminal support.
      */
     explicit terminal(std::ostream& stream = std::cout, ansi_mode mode = ansi_mode::automatic);
 
@@ -212,8 +209,7 @@ public:
     /**
      * Moves the cursor relative to its current position.
      *
-     * Positive columns move right, negative columns move left. Positive rows
-     * move down, negative rows move up.
+     * Positive columns move right, negative columns move left. Positive rows move down, negative rows move up.
      *
      * @param columns  Relative column movement.
      * @param rows     Relative row movement.
@@ -272,9 +268,8 @@ public:
     /**
      * Reads one key from the terminal.
      *
-     * The returned string contains the raw key byte sequence. POSIX terminals
-     * return their native byte sequences. Windows console key events are mapped
-     * to POSIX-style escape sequences for cursor and function keys.
+     * The returned string contains the raw key byte sequence. POSIX terminals return their native byte sequences.
+     * Windows console key events are mapped to POSIX-style escape sequences for cursor and function keys.
      *
      * @returns Raw key byte sequence, or an empty string on failure.
      */
@@ -311,17 +306,15 @@ public:
     /**
      * Clears a cell at the cursor position.
      *
-     * The current cell is replaced with a blank cell. Text to the right is not
-     * shifted and the cursor stays at its position.
+     * The current cell is replaced with a blank cell. Text to the right is not shifted and the cursor stays at its position.
      */
     void clear_cell();
 
     /**
      * Clears cells at the cursor position.
      *
-     * The cells are replaced with blank cells. Text to the right is not shifted
-     * and the cursor stays at its position. Nothing is written when the cell
-     * count is zero or negative.
+     * The cells are replaced with blank cells. Text to the right is not shifted and the cursor stays at its position.
+     * Nothing is written when the cell count is zero or negative.
      *
      * @param cells  Number of cells to clear.
      */
@@ -337,8 +330,7 @@ public:
     /**
      * Inserts blank cells at the cursor position.
      *
-     * Existing text to the right is shifted right within the current line.
-     * Nothing is written when the cell count is zero or negative.
+     * Existing text to the right is shifted right within the current line. Nothing is written when the cell count is zero or negative.
      *
      * @param cells  Number of cells to insert.
      */
@@ -354,8 +346,7 @@ public:
     /**
      * Deletes cells at the cursor position.
      *
-     * Existing text to the right is shifted left within the current line.
-     * Nothing is written when the cell count is zero or negative.
+     * Existing text to the right is shifted left within the current line. Nothing is written when the cell count is zero or negative.
      *
      * @param cells  Number of cells to delete.
      */
@@ -364,8 +355,7 @@ public:
     /**
      * Sets the vertical scrolling region.
      *
-     * Coordinates are one-based terminal rows. Nothing is written when the range
-     * is invalid.
+     * Coordinates are one-based terminal rows. Nothing is written when the range is invalid.
      *
      * @param top     First row in the scrolling region.
      * @param bottom  Last row in the scrolling region.
@@ -408,8 +398,7 @@ public:
     /**
      * Checks whether ANSI/VT output is enabled for this terminal.
      *
-     * This returns the resolved output state from the constructor, not the raw
-     * `ansi_mode` value.
+     * This returns the resolved output state from the constructor, not the raw `ansi_mode` value.
      *
      * @returns True when ANSI/VT control sequences are emitted.
      */

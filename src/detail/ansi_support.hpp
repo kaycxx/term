@@ -25,8 +25,7 @@ bool supports_ansi(std::ostream& stream);
 /**
  * Detects native ANSI/VT control sequence support for a stream.
  *
- * This is implemented per platform and does not apply environment variable
- * overrides.
+ * This is implemented per platform and does not apply environment variable overrides.
  *
  * @param stream  Stream to inspect.
  * @returns True when the stream natively supports ANSI/VT output.
