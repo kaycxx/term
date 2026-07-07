@@ -66,3 +66,15 @@ Automatic mode honors two common environment variables:
 `FORCE_COLOR` has priority over `NO_COLOR` in this library. If both are set and non-empty, ANSI/VT output is enabled.
 
 When neither variable is set, automatic mode checks whether the wrapped stream is connected to a terminal. On Windows, it also tries to enable virtual terminal output processing for stdout or stderr.
+
+## Resolved ANSI State
+
+Use `ansi_enabled()` to check the final ANSI/VT output state selected by the constructor.
+
+```cpp
+auto term = terminal();
+
+if (term.ansi_enabled()) {
+    term << "ANSI/VT output is active\n";
+}
+```

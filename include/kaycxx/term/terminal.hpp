@@ -405,6 +405,16 @@ public:
      */
     void scroll_down(int lines);
 
+    /**
+     * Checks whether ANSI/VT output is enabled for this terminal.
+     *
+     * This returns the resolved output state from the constructor, not the raw
+     * `ansi_mode` value.
+     *
+     * @returns True when ANSI/VT control sequences are emitted.
+     */
+    bool ansi_enabled() const;
+
 private:
     /** Output stream wrapped by the terminal. */
     std::ostream& stream_;

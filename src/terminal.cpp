@@ -310,6 +310,10 @@ void terminal::scroll_down(int lines) {
     }
 }
 
+bool terminal::ansi_enabled() const {
+    return ansi_enabled_;
+}
+
 terminal& terminal::operator<<(sgr value) {
     if (ansi_enabled_) {
         stream_ << "\033[" << value.code << 'm';
