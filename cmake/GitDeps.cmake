@@ -1,6 +1,6 @@
 # Copyright (c) 2026 Klaus Reimer
 # SPDX-License-Identifier: MIT
-# Version: 1.2.0
+# Version: 1.3.0
 # Source: https://github.com/kaycxx/cmake-git-deps
 
 if(COMMAND git_require)
@@ -9,17 +9,14 @@ endif()
 
 include(FetchContent)
 
-function(_git_normalize_version output value)
-    string(REGEX REPLACE "^v" "" normalized "${value}")
-
-    if(NOT normalized MATCHES "^[0-9]+(\\.[0-9]+)*$")
-        message(FATAL_ERROR
-            "Cannot derive a CMake package version from '${value}'. "
-            "Pass VERSION explicitly."
-        )
+function(_git_parse_required output is_version value)
+    if("${value}" MATCHES "^v?([0-9]+(\\.[0-9]+)*)$")
+        set("${output}" "${CMAKE_MATCH_1}" PARENT_SCOPE)
+        set("${is_version}" TRUE PARENT_SCOPE)
+    else()
+        set("${output}" "${value}" PARENT_SCOPE)
+        set("${is_version}" FALSE PARENT_SCOPE)
     endif()
-
-    set("${output}" "${normalized}" PARENT_SCOPE)
 endfunction()
 
 function(git_require target)
@@ -42,9 +39,9 @@ function(git_require target)
     endif()
 
     if(DEFINED ARG_VERSION)
-        _git_normalize_version(required "${ARG_VERSION}")
+        _git_parse_required(required required_is_version "${ARG_VERSION}")
     else()
-        _git_normalize_version(required "${ARG_REVISION}")
+        _git_parse_required(required required_is_version "${ARG_REVISION}")
     endif()
 
     if("${target}" MATCHES "^([^:]+)::([^:]+)$")
@@ -73,7 +70,9 @@ function(git_require target)
     string(REGEX REPLACE "[^A-Z0-9]+" "_" package_key "${package_key}")
     string(REGEX REPLACE "^_+|_+$" "" package_key "${package_key}")
 
-    string(REGEX MATCH "^[0-9]+" required_major "${required}")
+    if(required_is_version)
+        string(REGEX MATCH "^[0-9]+" required_major "${required}")
+    endif()
     string(TOUPPER "${target}" key)
     string(REGEX REPLACE "[^A-Z0-9]+" "_" key "${key}")
     string(REGEX REPLACE "^_+|_+$" "" key "${key}")
@@ -87,18 +86,25 @@ function(git_require target)
 
     get_property(selected GLOBAL PROPERTY "GIT_${package_key}_VERSION")
     if(selected)
-        string(REGEX MATCH "^[0-9]+" selected_major "${selected}")
-        if(NOT selected_major STREQUAL required_major)
-            message(FATAL_ERROR
-                "${package} v${selected} is already selected, "
-                "but v${required} requires major version ${required_major}"
-            )
-        endif()
+        if(required_is_version AND selected MATCHES "^[0-9]+(\\.[0-9]+)*$")
+            string(REGEX MATCH "^[0-9]+" selected_major "${selected}")
+            if(NOT selected_major STREQUAL required_major)
+                message(FATAL_ERROR
+                    "${package} ${selected} is already selected, "
+                    "but ${required} requires major version ${required_major}"
+                )
+            endif()
 
-        if(selected VERSION_LESS required)
+            if(selected VERSION_LESS required)
+                message(FATAL_ERROR
+                    "${package} ${selected} is already selected, "
+                    "but ${required} or newer is required"
+                )
+            endif()
+        elseif(NOT selected STREQUAL required)
             message(FATAL_ERROR
-                "${package} v${selected} is already selected, "
-                "but v${required} or newer is required"
+                "${package} ${selected} is already selected, "
+                "but ${required} was requested"
             )
         endif()
 
@@ -107,20 +113,26 @@ function(git_require target)
         endif()
     endif()
 
-    if("${${use_system_var}}")
+    if("${${use_system_var}}" AND required_is_version)
         find_package("${package}" "${required}" CONFIG QUIET)
-
         if(TARGET "${target}")
             set(actual "${required}")
             if(NOT "${${package}_VERSION}" STREQUAL "")
                 set(actual "${${package}_VERSION}")
             endif()
 
-            string(REGEX MATCH "^[0-9]+" actual_major "${actual}")
-            if(NOT actual_major STREQUAL required_major)
+            if(required_is_version AND actual MATCHES "^[0-9]+(\\.[0-9]+)*$")
+                string(REGEX MATCH "^[0-9]+" actual_major "${actual}")
+                if(NOT actual_major STREQUAL required_major)
+                    message(FATAL_ERROR
+                        "Installed ${package} ${actual} was found, "
+                        "but ${required} requires major version ${required_major}"
+                    )
+                endif()
+            elseif(NOT actual STREQUAL required)
                 message(FATAL_ERROR
-                    "Installed ${package} v${actual} was found, "
-                    "but v${required} requires major version ${required_major}"
+                    "Installed ${package} ${actual} was found, "
+                    "but ${required} was requested"
                 )
             endif()
 
@@ -135,7 +147,7 @@ function(git_require target)
         if(NOT "${${package}_CONSIDERED_CONFIGS}" STREQUAL "")
             message(FATAL_ERROR
                 "Installed ${package} was found, but no compatible version for "
-                "v${required}. Considered versions: ${${package}_CONSIDERED_VERSIONS}"
+                "${required}. Considered versions: ${${package}_CONSIDERED_VERSIONS}"
             )
         endif()
     endif()
