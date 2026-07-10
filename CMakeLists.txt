@@ -5,7 +5,7 @@ set(NAMESPACE kaycxx)
 set(PACKAGE_NAME ${NAMESPACE}-${NAME})
 
 project(${PACKAGE_NAME}
-    VERSION 1.0.0
+    VERSION 0.0.1
     DESCRIPTION "C++ terminal library"
     HOMEPAGE_URL "https://github.com/${NAMESPACE}/${NAME}"
     LANGUAGES CXX
