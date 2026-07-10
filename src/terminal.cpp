@@ -21,67 +21,79 @@ namespace kaycxx::term {
 
 terminal::terminal(std::ostream& stream, ansi_mode mode)
     : stream_(stream)
-    , ansi_enabled_(false)
+    , formatting_enabled_(false)
+    , commands_enabled_(false)
     , input_modes_(std::make_unique<detail::input_mode_stack>())
 {
     switch (mode) {
-        case ansi_mode::never:
-            ansi_enabled_ = false;
+        case ansi_mode::none:
+            formatting_enabled_ = false;
+            commands_enabled_ = false;
             break;
-        case ansi_mode::always:
-            ansi_enabled_ = true;
+        case ansi_mode::formatting_only:
+            formatting_enabled_ = true;
+            commands_enabled_ = false;
+            break;
+        case ansi_mode::commands_only:
+            formatting_enabled_ = false;
+            commands_enabled_ = true;
+            break;
+        case ansi_mode::full:
+            formatting_enabled_ = true;
+            commands_enabled_ = true;
             break;
         case ansi_mode::automatic:
-            ansi_enabled_ = detail::supports_ansi(stream);
+            commands_enabled_ = detail::detect_command_support(stream);
+            formatting_enabled_ = detail::resolve_formatting_enabled(commands_enabled_);
     }
 }
 
 terminal::~terminal() = default;
 
 void terminal::clear_screen() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[2J";
     }
 }
 
 void terminal::clear_screen_to_end() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[J";
     }
 }
 
 void terminal::clear_screen_to_start() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[1J";
     }
 }
 
 void terminal::clear_scrollback() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[3J";
     }
 }
 
 void terminal::clear_line() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[2K";
     }
 }
 
 void terminal::clear_line_to_end() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[K";
     }
 }
 
 void terminal::clear_line_to_start() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[1K";
     }
 }
 
 void terminal::push_title(std::string_view title) {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[22;2t";
         stream_ << "\033]2;";
         stream_ << detail::sanitize_osc_payload(title);
@@ -90,50 +102,50 @@ void terminal::push_title(std::string_view title) {
 }
 
 void terminal::pop_title() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[23;2t";
     }
 }
 
 void terminal::hide_cursor() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[?25l";
     }
 }
 
 void terminal::show_cursor() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[?25h";
     }
 }
 
 void terminal::save_cursor() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[s";
     }
 }
 
 void terminal::restore_cursor() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[u";
     }
 }
 
 void terminal::set_cursor_style(cursor_style style) {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[" << static_cast<int>(style) << " q";
     }
 }
 
 void terminal::move_to(int column, int row) {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[" << column << "G";
         stream_ << "\033[" << row << "d";
     }
 }
 
 void terminal::move_by(int columns, int rows) {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         if (columns > 0) {
             stream_ << "\033[" << columns << "C";
         } else if (columns < 0) {
@@ -148,31 +160,31 @@ void terminal::move_by(int columns, int rows) {
 }
 
 void terminal::move_to_column(int column) {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[" << column << "G";
     }
 }
 
 void terminal::enable_wrap() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[?7h";
     }
 }
 
 void terminal::disable_wrap() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[?7l";
     }
 }
 
 void terminal::enter_alternate_screen() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[?1049h";
     }
 }
 
 void terminal::leave_alternate_screen() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[?1049l";
     }
 }
@@ -215,114 +227,118 @@ std::string terminal::read_key() {
 }
 
 void terminal::insert_line() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[L";
     }
 }
 
 void terminal::insert_lines(int lines) {
-    if (ansi_enabled_ && lines > 0) {
+    if (commands_enabled_ && lines > 0) {
         stream_ << "\033[" << lines << "L";
     }
 }
 
 void terminal::delete_line() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[M";
     }
 }
 
 void terminal::delete_lines(int lines) {
-    if (ansi_enabled_ && lines > 0) {
+    if (commands_enabled_ && lines > 0) {
         stream_ << "\033[" << lines << "M";
     }
 }
 
 void terminal::clear_cell() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[X";
     }
 }
 
 void terminal::clear_cells(int cells) {
-    if (ansi_enabled_ && cells > 0) {
+    if (commands_enabled_ && cells > 0) {
         stream_ << "\033[" << cells << "X";
     }
 }
 
 void terminal::insert_cell() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[@";
     }
 }
 
 void terminal::insert_cells(int cells) {
-    if (ansi_enabled_ && cells > 0) {
+    if (commands_enabled_ && cells > 0) {
         stream_ << "\033[" << cells << "@";
     }
 }
 
 void terminal::delete_cell() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[P";
     }
 }
 
 void terminal::delete_cells(int cells) {
-    if (ansi_enabled_ && cells > 0) {
+    if (commands_enabled_ && cells > 0) {
         stream_ << "\033[" << cells << "P";
     }
 }
 
 void terminal::set_scroll_region(int top, int bottom) {
-    if (ansi_enabled_ && top > 0 && bottom >= top) {
+    if (commands_enabled_ && top > 0 && bottom >= top) {
         stream_ << "\033[" << top << ';' << bottom << 'r';
     }
 }
 
 void terminal::reset_scroll_region() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[r";
     }
 }
 
 void terminal::scroll_up() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[S";
     }
 }
 
 void terminal::scroll_up(int lines) {
-    if (ansi_enabled_ && lines > 0) {
+    if (commands_enabled_ && lines > 0) {
         stream_ << "\033[" << lines << 'S';
     }
 }
 
 void terminal::scroll_down() {
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_ << "\033[T";
     }
 }
 
 void terminal::scroll_down(int lines) {
-    if (ansi_enabled_ && lines > 0) {
+    if (commands_enabled_ && lines > 0) {
         stream_ << "\033[" << lines << 'T';
     }
 }
 
-bool terminal::ansi_enabled() const {
-    return ansi_enabled_;
+bool terminal::formatting_enabled() const noexcept {
+    return formatting_enabled_;
+}
+
+bool terminal::commands_enabled() const noexcept {
+    return commands_enabled_;
 }
 
 terminal& terminal::operator<<(sgr value) {
-    if (ansi_enabled_) {
+    if (formatting_enabled_) {
         stream_ << "\033[" << value.code << 'm';
     }
     return *this;
 }
 
 terminal& terminal::operator<<(color_style style) {
-    if (ansi_enabled_) {
+    if (formatting_enabled_) {
         std::visit([&](auto const& value) {
             write_color_value(value, style);
         }, style.value);
@@ -334,7 +350,7 @@ terminal& terminal::operator<<(hyperlink const& value) {
     auto const url = detail::sanitize_osc_payload(value.url);
     auto const text = detail::sanitize_osc_payload(value.text);
 
-    if (ansi_enabled_) {
+    if (commands_enabled_) {
         stream_
             << "\033]8;;" << url << "\033\\"
             << text

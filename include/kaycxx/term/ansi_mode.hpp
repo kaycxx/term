@@ -11,17 +11,23 @@
 namespace kaycxx::term {
 
 /**
- * Controls when ANSI/VT terminal control sequences are emitted.
+ * Selects which ANSI/VT formatting and terminal commands are emitted.
  */
 enum class ansi_mode {
-    /** Detect terminal support automatically and honor color environment variables. */
+    /** Detect terminal command support and honor color environment variables for formatting. */
     automatic,
 
-    /** Always emit ANSI/VT control sequences. */
-    always,
+    /** Do not emit ANSI/VT formatting or terminal commands. */
+    none,
 
-    /** Never emit ANSI/VT control sequences. */
-    never
+    /** Emit ANSI/VT formatting but no terminal commands. */
+    formatting_only,
+
+    /** Emit ANSI/VT terminal commands but no formatting. */
+    commands_only,
+
+    /** Emit all ANSI/VT formatting and terminal commands. */
+    full
 };
 
 } // namespace kaycxx::term

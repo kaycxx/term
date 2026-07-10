@@ -27,14 +27,14 @@ bool has_env(char const* name) {
 
 namespace kaycxx::term::detail {
 
-bool supports_ansi(std::ostream& stream) {
+bool resolve_formatting_enabled(bool fallback) {
     if (has_env("FORCE_COLOR")) {
         return true;
     }
     if (has_env("NO_COLOR")) {
         return false;
     }
-    return detect_ansi_support(stream);
+    return fallback;
 }
 
 } // namespace kaycxx::term::detail

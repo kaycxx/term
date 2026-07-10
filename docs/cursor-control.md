@@ -1,6 +1,6 @@
 # Cursor Control
 
-Cursor control methods write ANSI/VT cursor sequences when ANSI output is enabled. Coordinates are one-based terminal coordinates: column `1`, row `1` is the top-left cell.
+Cursor control methods write ANSI/VT cursor sequences when terminal commands are enabled. Coordinates are one-based terminal coordinates: column `1`, row `1` is the top-left cell.
 
 ```cpp
 #include <kaycxx/term.hpp>

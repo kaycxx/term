@@ -1,6 +1,6 @@
 # Screen Control
 
-Screen control methods are thin wrappers around ANSI/VT sequences for clearing, inserting, deleting, scrolling, and alternate-screen rendering.
+Screen control methods are thin wrappers around ANSI/VT commands for clearing, inserting, deleting, scrolling, and alternate-screen rendering. They emit output only when terminal commands are enabled.
 
 ```cpp
 #include <kaycxx/term.hpp>

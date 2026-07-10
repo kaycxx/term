@@ -1,6 +1,6 @@
 # Copyright (c) 2026 Klaus Reimer
 # SPDX-License-Identifier: MIT
-# Version: 1.3.0
+# Version: 1.3.2
 # Source: https://github.com/kaycxx/cmake-git-deps
 
 if(COMMAND git_require)
@@ -113,6 +113,11 @@ function(git_require target)
         endif()
     endif()
 
+    if(TARGET "${target}")
+        set_property(GLOBAL PROPERTY "GIT_${package_key}_VERSION" "${required}")
+        return()
+    endif()
+
     if("${${use_system_var}}" AND required_is_version)
         find_package("${package}" "${required}" CONFIG QUIET)
         if(TARGET "${target}")
@@ -160,7 +165,34 @@ function(git_require target)
         GIT_TAG "${ARG_REVISION}"
         EXCLUDE_FROM_ALL
     )
+
+    get_property(build_shared_libs_cache_exists CACHE BUILD_SHARED_LIBS PROPERTY VALUE SET)
+    if(build_shared_libs_cache_exists)
+        get_property(build_shared_libs_cache_value CACHE BUILD_SHARED_LIBS PROPERTY VALUE)
+    endif()
+
+    if(DEFINED BUILD_SHARED_LIBS)
+        set(build_shared_libs_value "${BUILD_SHARED_LIBS}")
+        set(build_shared_libs_exists TRUE)
+    else()
+        set(build_shared_libs_exists FALSE)
+    endif()
+
+    set(BUILD_SHARED_LIBS OFF)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
     FetchContent_MakeAvailable("${package}")
+
+    if(build_shared_libs_cache_exists)
+        set(BUILD_SHARED_LIBS "${build_shared_libs_cache_value}" CACHE BOOL "Build shared libraries" FORCE)
+    else()
+        unset(BUILD_SHARED_LIBS CACHE)
+    endif()
+
+    if(build_shared_libs_exists)
+        set(BUILD_SHARED_LIBS "${build_shared_libs_value}")
+    else()
+        unset(BUILD_SHARED_LIBS)
+    endif()
 
     if(NOT TARGET "${target}")
         message(FATAL_ERROR "${package} did not define ${target}")

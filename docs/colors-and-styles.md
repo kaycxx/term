@@ -1,6 +1,6 @@
 # Colors and Styles
 
-`kaycxx-term` writes Select Graphic Rendition (SGR) sequences through stream values. ANSI/VT output is controlled when the terminal is created.
+`kaycxx-term` writes Select Graphic Rendition (SGR) sequences through stream values when formatting is enabled for the terminal.
 
 ```cpp
 #include <kaycxx/term.hpp>

@@ -13,23 +13,23 @@
 namespace kaycxx::term::detail {
 
 /**
- * Checks whether ANSI/VT control sequences should be written for a stream.
+ * Resolves whether ANSI/VT formatting should be written.
  *
- * The result honors NO_COLOR and FORCE_COLOR.
+ * `FORCE_COLOR` enables formatting and takes priority over `NO_COLOR`, which disables it. The fallback is returned when neither variable is set.
  *
- * @param stream  Stream to inspect.
- * @returns True when ANSI/VT output should be enabled.
+ * @param fallback  Value to return when no color environment variable is set.
+ * @returns Resolved formatting state.
  */
-bool supports_ansi(std::ostream& stream);
+bool resolve_formatting_enabled(bool fallback);
 
 /**
- * Detects native ANSI/VT control sequence support for a stream.
+ * Detects native ANSI/VT terminal command support for a stream.
  *
  * This is implemented per platform and does not apply environment variable overrides.
  *
  * @param stream  Stream to inspect.
- * @returns True when the stream natively supports ANSI/VT output.
+ * @returns True when the stream natively supports ANSI/VT terminal commands.
  */
-bool detect_ansi_support(std::ostream& stream);
+bool detect_command_support(std::ostream& stream);
 
 } // namespace kaycxx::term::detail

@@ -44,7 +44,7 @@ bool enable_ansi(DWORD std_handle) {
 
 namespace kaycxx::term::detail {
 
-bool detect_ansi_support(std::ostream& stream) {
+bool detect_command_support(std::ostream& stream) {
     if (&stream == &std::cout) {
         static bool const supported = enable_ansi(STD_OUTPUT_HANDLE);
         return supported;

@@ -13,7 +13,7 @@
 
 namespace kaycxx::term::detail {
 
-bool detect_ansi_support(std::ostream& stream) {
+bool detect_command_support(std::ostream& stream) {
     if (&stream == &std::cout) {
         return isatty(STDOUT_FILENO);
     }

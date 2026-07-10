@@ -35,18 +35,18 @@ class input_mode_stack;
 /**
  * Terminal output and input helper.
  *
- * The terminal writes ANSI/VT control sequences when enabled and provides minimal cross-platform input mode and key reading helpers.
+ * The terminal writes ANSI/VT formatting and terminal commands when enabled and provides minimal cross-platform input mode and key reading helpers.
  */
 class terminal {
 public:
     /**
      * Creates a terminal helper for an output stream.
      *
-     * The stream defaults to `std::cout`. All text and all ANSI/VT control sequences are written to this stream.
-     * In automatic ANSI mode, the stream is also used to detect whether ANSI/VT output should be enabled.
+     * The stream defaults to `std::cout`. All text and all ANSI/VT output is written to this stream.
+     * In automatic ANSI mode, the stream is used to detect terminal command support while `FORCE_COLOR` and `NO_COLOR` independently control formatting.
      *
      * @param stream  Output stream to write to. The stream must outlive the terminal.
-     * @param mode    ANSI control sequence mode. Automatic mode checks `FORCE_COLOR`, `NO_COLOR`, and terminal support.
+     * @param mode    ANSI output mode. Automatic mode detects terminal commands and separately honors `FORCE_COLOR` and `NO_COLOR` for formatting.
      */
     explicit terminal(std::ostream& stream = std::cout, ansi_mode mode = ansi_mode::automatic);
 
@@ -396,20 +396,32 @@ public:
     void scroll_down(int lines);
 
     /**
-     * Checks whether ANSI/VT output is enabled for this terminal.
+     * Checks whether ANSI/VT formatting is enabled for this terminal.
      *
-     * This returns the resolved output state from the constructor, not the raw `ansi_mode` value.
+     * Formatting includes colors and SGR text styles. This returns the resolved formatting state from the constructor, not the raw `ansi_mode` value.
      *
-     * @returns True when ANSI/VT control sequences are emitted.
+     * @returns True when ANSI/VT formatting is emitted.
      */
-    bool ansi_enabled() const;
+    bool formatting_enabled() const noexcept;
+
+    /**
+     * Checks whether ANSI/VT terminal commands are enabled for this terminal.
+     *
+     * Terminal commands include cursor movement, screen manipulation, title changes, hyperlinks, and terminal modes. Color environment variables do not affect this state.
+     *
+     * @returns True when ANSI/VT terminal commands are emitted.
+     */
+    bool commands_enabled() const noexcept;
 
 private:
     /** Output stream wrapped by the terminal. */
     std::ostream& stream_;
 
-    /** Whether ANSI/VT output sequences should be written. */
-    bool ansi_enabled_;
+    /** Whether ANSI/VT formatting should be written. */
+    bool formatting_enabled_;
+
+    /** Whether ANSI/VT terminal commands should be written. */
+    bool commands_enabled_;
 
     /** Stack of saved input states. */
     std::unique_ptr<detail::input_mode_stack> input_modes_;

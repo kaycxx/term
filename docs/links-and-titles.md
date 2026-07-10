@@ -1,6 +1,6 @@
 # Links and Titles
 
-Terminal hyperlinks and title changes use OSC sequences when ANSI output is enabled. OSC payloads are sanitized by removing ESC and BEL so user-provided text cannot terminate the OSC sequence.
+Terminal hyperlinks and title changes use OSC sequences when terminal commands are enabled. OSC payloads are sanitized by removing ESC and BEL so user-provided text cannot terminate the OSC sequence.
 
 ```cpp
 #include <kaycxx/term.hpp>
@@ -14,7 +14,7 @@ int main() {
 }
 ```
 
-When ANSI output is disabled, hyperlinks are rendered as plain text followed by the URL in parentheses.
+When terminal commands are disabled, hyperlinks are rendered as plain text followed by the URL in parentheses.
 
 ```txt
 kaycxx-term (https://github.com/kaycxx/term)
