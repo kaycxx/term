@@ -1,6 +1,8 @@
 # kaycxx-term
 
-C++26 terminal output and key input helpers.
+Terminal output and key input helpers.
+
+Requires C++26.
 
 [GitHub] | [API Documentation]
 
@@ -47,14 +49,14 @@ c++ main.o $(pkg-config --libs kaycxx-term)
 ## Build From Source
 
 ```sh
-cmake -S . -B build
+cmake -B build
 cmake --build build
 ```
 
 A shared library is built by default. For a static build:
 
 ```sh
-cmake -S . -B build -D BUILD_SHARED_LIBS=OFF
+cmake -B build -D BUILD_SHARED_LIBS=OFF
 cmake --build build
 ```
 
