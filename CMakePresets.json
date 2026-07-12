@@ -32,6 +32,7 @@
         {
             "name": "debug",
             "displayName": "Debug",
+            "generator": "Ninja",
             "inherits": [
                 "debug-linux",
                 "debug-windows"
@@ -41,6 +42,7 @@
         {
             "name": "release",
             "displayName": "Release",
+            "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
@@ -49,6 +51,7 @@
         {
             "name": "windows-cross-debug",
             "displayName": "Windows Cross Debug",
+            "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/windows-debug",
             "toolchainFile": "${sourceDir}/cmake/toolchains/mingw-w64-x86_64.cmake",
             "cacheVariables": {
@@ -60,6 +63,7 @@
         {
             "name": "windows-cross-release",
             "displayName": "Windows Cross Release",
+            "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/windows-release",
             "toolchainFile": "${sourceDir}/cmake/toolchains/mingw-w64-x86_64.cmake",
             "cacheVariables": {

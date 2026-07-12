@@ -2,9 +2,12 @@
 
 Terminal output and key input helpers.
 
-Requires C++26.
-
 [GitHub] | [API Documentation]
+
+## Requirements
+
+- C++23 compiler and standard library
+- Exception support
 
 ## Usage
 
